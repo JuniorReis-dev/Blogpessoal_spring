@@ -20,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.generetions.blogpessoal.model.Postagem;
 import com.generetions.blogpessoal.repository.PostagemRepository;
+import com.generetions.blogpessoal.repository.TemaRepository;
 
 import jakarta.validation.Valid;
 
@@ -29,55 +30,128 @@ import jakarta.validation.Valid;
 public class PostagemController {
 	
 	@Autowired
-	 private PostagemRepository postagemRepository ;
-	
+	private PostagemRepository postagemRepository;
+
+	@Autowired
+	private TemaRepository temaRepository;
+
 	@GetMapping
-     public ResponseEntity<List<Postagem>> getAll(){
-    	 return ResponseEntity.ok(postagemRepository.findAll());
-     }
-	
+	public ResponseEntity<List<Postagem>> getAll() {
+
+		/**
+		 * O Método executará a consulta: SELECT * FROM tb_postagens;
+		 */
+		return ResponseEntity.ok(postagemRepository.findAll());
+
+	}
+
 	@GetMapping("/{id}")
-    public ResponseEntity<Postagem> getById(@PathVariable Long id){
-        return postagemRepository.findById(id)
-                .map(resposta -> ResponseEntity.ok(resposta))
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-    }
+	public ResponseEntity<Postagem> getById(@PathVariable Long id) {
 
-    @GetMapping("/titulo/{titulo}")
-    public ResponseEntity<List<Postagem>> getAllByTitulo(@PathVariable String titulo) {
+		/**
+		 * O Método executará a consulta: SELECT * FROM tb_postagens WHERE id = ?; A
+		 * interrogação representa o valor inserido no parâmetro id do método getById
+		 */
+		return postagemRepository.findById(id).map(resposta -> ResponseEntity.ok(resposta))
+				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+	}
 
-        return ResponseEntity.ok(postagemRepository.findAllByTituloContainingIgnoreCase(titulo));
-    }
+	@GetMapping("/titulo/{titulo}")
+	public ResponseEntity<List<Postagem>> getAllByTitulo(@PathVariable String titulo) {
 
-    @PostMapping
-    public ResponseEntity<Postagem> post(@Valid @RequestBody Postagem postagem){
-        return ResponseEntity.status(HttpStatus.CREATED).body(postagemRepository.save(postagem));
-    }
+		/**
+		 * O Método executará a consulta: SELECT * FROM tb_postagens WHERE titulo LIKE
+		 * '%?%"; A interrogação representa o valor inserido no parâmetro titulo do
+		 * método getAllByTitulo
+		 */
+		return ResponseEntity.ok(postagemRepository.findAllByTituloContainingIgnoreCase(titulo));
 
-    @PutMapping
-    public ResponseEntity<Postagem> put(@Valid @RequestBody Postagem postagem){
+	}
 
-        if(postagem.getId() == null )
-            return ResponseEntity.badRequest().build();
+	@PostMapping
+	public ResponseEntity<Postagem> post(@Valid @RequestBody Postagem postagem) {
 
-        if(postagemRepository.existsById(postagem.getId())) 
-            return ResponseEntity.status(HttpStatus.OK).body(postagemRepository.save(postagem));
+		/** 
+		 * Verifica se o tema existe antes de persistir a postagem no Banco de dados
+		 * */
+		if (temaRepository.existsById(postagem.getTema().getId())) {
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+			/**
+			 * O Método executará a consulta: INSERT INTO tb_postagens VALUES (titulo,
+			 * texto, data) VALUES (?, ?, ?); As interrogações representam os valores
+			 * inseridos nos respectivos atributos do objeto postagem, parâmetro do método
+			 * post.
+			 */
+			return ResponseEntity.status(HttpStatus.CREATED).body(postagemRepository.save(postagem));
+		}
+		
+		/** 
+		 * Caso o tema não exista, retorna um Bad Request informando que o tema não existe
+		 * */
+		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O Tema não existe!", null);
+	}
 
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
+	@PutMapping
+	public ResponseEntity<Postagem> put(@Valid @RequestBody Postagem postagem) {
 
-        Optional<Postagem> postagem = postagemRepository.findById(id);
-        if(postagem.isEmpty())
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+		/**
+		 * Verifica se o id é nulo. Se for nulo, retorna o HTTP Status 400 - BAD_REQUEST
+		 */
+		if (postagem.getId() == null)
+			return ResponseEntity.badRequest().build();
 
-        postagemRepository.deleteById(id);
+		/**
+		 * Antes de atualizar, verifica se a postagem existe. Se existir, atualiza
+		 */
+		if (postagemRepository.existsById(postagem.getId())) {
+			
+			/** 
+			 * Verifica se o tema existe antes de atualizar a postagem no Banco de dados
+			 * */
+			if (temaRepository.existsById(postagem.getTema().getId()))
+				/**
+				 * O Método executará a consulta: UPDATE tb_postagens SET titulo = ?, texto = ?,
+				 * data = ? WHERE id = ?; As interrogações representam os valores inseridos nos
+				 * respectivos atributos do objeto postagem, parâmetro do método post.
+				 */
+				return ResponseEntity.status(HttpStatus.OK).body(postagemRepository.save(postagem));
+		
+			/** 
+			 * Caso o tema não exista, retorna um Bad Request informando que o tema não existe
+			 * */
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O Tema não existe!", null);
+			
+		}
+		/**
+		 * Se a postagem não existir, retorna o HTTP Status 404 - NOT_FOUND
+		 */
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
-        //DELETE FROM tb_postagens WHERE id=?;
-    }
+	}
+
+	@DeleteMapping("/{id}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void delete(@PathVariable Long id) {
+
+		/**
+		 * Busca a postagem pelo id e guarda o resultado no Optional postagem
+		 */
+		Optional<Postagem> postagem = postagemRepository.findById(id);
+
+		/**
+		 * Verifica se o Optional postagem está vazio. Se estiver vazio, retorna o HTTP
+		 * Status 404 - NOT_FOUND
+		 */
+		if (postagem.isEmpty())
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+
+		/**
+		 * Caso contrário, o Método executará a consulta: DELETE FROM tb_postagens WHERE
+		 * id = ?; A interrogação representa parâmetro id do método delete.
+		 */
+		postagemRepository.deleteById(id);
+
+	}
 	
 	
 }
