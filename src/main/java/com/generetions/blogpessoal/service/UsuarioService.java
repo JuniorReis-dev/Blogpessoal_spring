@@ -1,4 +1,5 @@
 package com.generetions.blogpessoal.service;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -20,71 +21,84 @@ import com.generetions.blogpessoal.security.JwtService;
 @Service
 public class UsuarioService {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+	@Autowired
+	private UsuarioRepository usuarioRepository;
 
-    @Autowired
-    private JwtService jwtService;
+	@Autowired
+	private JwtService jwtService;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+	@Autowired
+	private AuthenticationManager authenticationManager;
 
-    public Optional<Usuario> cadastrarUsuario(Usuario usuario) {
+	public List<Usuario> getAll() {
+		return usuarioRepository.findAll();
+	}
 
-        if(usuarioRepository.findByUsuario(usuario.getUsuario()).isPresent()) { 
-            return Optional.empty();
-        }
+	public Optional<Usuario> getById(Long id) {
+		return usuarioRepository.findById(id);
+	}
 
-        usuario.setSenha(criptografarSenha(usuario.getSenha()));
+	public Optional<Usuario> cadastrarUsuario(Usuario usuario) {
 
-        return Optional.ofNullable(usuarioRepository.save(usuario));
-    }
+		if (usuarioRepository.findByUsuario(usuario.getUsuario()).isPresent()) {
+			return Optional.empty();
+		}
 
-    public Optional<Usuario> atualizarUsuario(Usuario usuario) {
+		usuario.setSenha(criptografarSenha(usuario.getSenha()));
 
-    	if (usuarioRepository.findById(usuario.getId()).isPresent()) {
+		return Optional.ofNullable(usuarioRepository.save(usuario));
+	}
+
+	public Optional<Usuario> atualizarUsuario(Usuario usuario) {
+
+		if(usuarioRepository.findById(usuario.getId()).isPresent()) {
 
 			Optional<Usuario> buscaUsuario = usuarioRepository.findByUsuario(usuario.getUsuario());
 
-			if ((buscaUsuario.isPresent()) && (buscaUsuario.get().getId() != usuario.getId()))
+			if ( (buscaUsuario.isPresent()) && ( buscaUsuario.get().getId() != usuario.getId()))
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuário já existe!", null);
 
 			usuario.setSenha(criptografarSenha(usuario.getSenha()));
 
 			return Optional.ofNullable(usuarioRepository.save(usuario));
-
+			
 		}
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado!", null);
-    }
 
-    public Optional<UsuarioLogin> autenticarUsuario(Optional<UsuarioLogin> usuarioLogin) {
+		return Optional.empty();
+	}
 
-        var credenciais = new UsernamePasswordAuthenticationToken(usuarioLogin.get().getUsuario(), usuarioLogin.get().getSenha());
+	public Optional<UsuarioLogin> autenticarUsuario(Optional<UsuarioLogin> usuarioLogin) {
 
-        Authentication authentication = authenticationManager.authenticate(credenciais);
+		var credenciais = new UsernamePasswordAuthenticationToken(usuarioLogin.get().getUsuario(),
+				usuarioLogin.get().getSenha());
 
-        if(authentication.isAuthenticated()) {
-            Optional<Usuario> usuario = usuarioRepository.findByUsuario(usuarioLogin.get().getUsuario());
+		Authentication authentication = authenticationManager.authenticate(credenciais);
 
-            if(usuario.isPresent()) {
-                usuarioLogin.get().setId(usuario.get().getId());
-                usuarioLogin.get().setNome(usuario.get().getNome());
-                usuarioLogin.get().setFoto(usuario.get().getFoto());
-                usuarioLogin.get().setSenha("");
-                usuarioLogin.get().setToken(gerarToken(usuarioLogin.get().getUsuario()));
+		if (authentication.isAuthenticated()) {
 
-                return usuarioLogin;
-            }
-        }
-        return Optional.empty();
-    } 
+			Optional<Usuario> usuario = usuarioRepository.findByUsuario(usuarioLogin.get().getUsuario());
 
-    private String gerarToken(String usuario) {
-        return "Bearer " + jwtService.generateToken(usuario);
-    }
+			if (usuario.isPresent()) {
 
-    private String criptografarSenha(String senha) {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        return encoder.encode(senha);
-    }
+				usuarioLogin.get().setId(usuario.get().getId());
+				usuarioLogin.get().setNome(usuario.get().getNome());
+				usuarioLogin.get().setFoto(usuario.get().getFoto());
+				usuarioLogin.get().setSenha("");
+				usuarioLogin.get().setToken(gerarToken(usuarioLogin.get().getUsuario()));
+
+				return usuarioLogin;
+			}
+		}
+
+		return Optional.empty();
+	}
+
+	private String gerarToken(String usuario) {
+		return "Bearer " + jwtService.generateToken(usuario);
+	}
+
+	private String criptografarSenha(String senha) {
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		return encoder.encode(senha);
+	}
 }

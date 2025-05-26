@@ -19,75 +19,77 @@ import jakarta.validation.constraints.Size;
 @Entity
 @Table(name = "tb_usuarios")
 public class Usuario {
-		@Id
-		@GeneratedValue(strategy = GenerationType.IDENTITY)
-		private Long id;
 
-		@NotBlank(message = "O Atributo Nome é Obrigatório!")
-		private String nome;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-		@NotBlank(message = "O Atributo Usuário é Obrigatório!")
-		@Email(message = "O Atributo Usuário deve ser um email válido!")
-		private String usuario;
+	@NotBlank(message = "O Atributo Nome é Obrigatório!")
+	private String nome;
 
-		@NotBlank(message = "O Atributo Senha é Obrigatório!")
-		@Size(min = 8, message = "A Senha deve ter no mínimo 8 caracteres")
-		private String senha;
+	@NotBlank(message = "O Atributo Usuário é Obrigatório!")
+	@Email(message = "O Atributo Usuário deve ser um email válido!")
+	private String usuario;
 
-		@Size(max = 5000, message = "O link da foto não pode ser maior do que 5000 caracteres")
-		private String foto;
+	@NotBlank(message = "O Atributo Senha é Obrigatório!")
+	@Size(min = 8, message = "A Senha deve ter no mínimo 8 caracteres")
+	private String senha;
 
-		@OneToMany(fetch = FetchType.LAZY, mappedBy = "usuario", cascade = CascadeType.REMOVE)
-		@JsonIgnoreProperties("usuario")
-		private List<Postagem> postagem;
+	@Size(max = 5000, message = "O link da foto não pode ser maior do que 5000 caracteres")
+	private String foto;
 
-		/* Insira os Getters and Setters */
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "usuario", cascade = CascadeType.REMOVE)
+	@JsonIgnoreProperties("usuario")
+	private List<Postagem> postagem;
 
-		public Long getId() {
-			return this.id;
-		}
+	/* Insira os Getters and Setters */
 
-		public void setId(Long id) {
-			this.id = id;
-		}
+	public Long getId() {
+		return this.id;
+	}
 
-		public String getNome() {
-			return this.nome;
-		}
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-		public void setNome(String nome) {
-			this.nome = nome;
-		}
+	public String getNome() {
+		return this.nome;
+	}
 
-		public String getUsuario() {
-			return this.usuario;
-		}
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
 
-		public void setUsuario(String usuario) {
-			this.usuario = usuario;
-		}
+	public String getUsuario() {
+		return this.usuario;
+	}
 
-		public String getSenha() {
-			return this.senha;
-		}
+	public void setUsuario(String usuario) {
+		this.usuario = usuario;
+	}
 
-		public void setSenha(String senha) {
-			this.senha = senha;
-		}
+	public String getSenha() {
+		return this.senha;
+	}
 
-		public String getFoto() {
-			return this.foto;
-		}
+	public void setSenha(String senha) {
+		this.senha = senha;
+	}
 
-		public void setFoto(String foto) {
-			this.foto = foto;
-		}
+	public String getFoto() {
+		return this.foto;
+	}
 
-		public List<Postagem> getPostagem() {
-			return this.postagem;
-		}
+	public void setFoto(String foto) {
+		this.foto = foto;
+	}
 
-		public void setPostagem(List<Postagem> postagem) {
-			this.postagem = postagem;
-		}
+	public List<Postagem> getPostagem() {
+		return this.postagem;
+	}
+
+	public void setPostagem(List<Postagem> postagem) {
+		this.postagem = postagem;
+	}
+
 }
