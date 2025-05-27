@@ -1,5 +1,6 @@
 package com.generetions.blogpessoal.security;
 
+
 import java.util.Collection;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.generetions.blogpessoal.model.Usuario;
+
 
 public class UserDetailsImpl implements UserDetails {
 

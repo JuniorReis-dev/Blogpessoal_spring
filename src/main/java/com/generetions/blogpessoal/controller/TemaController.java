@@ -1,5 +1,6 @@
 package com.generetions.blogpessoal.controller;
 
+
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +28,7 @@ import jakarta.validation.Valid;
 @RequestMapping("/temas")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class TemaController {
+
 	@Autowired
 	private TemaRepository temaRepository;
 

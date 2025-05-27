@@ -1,5 +1,7 @@
 package com.generetions.blogpessoal.security;
 
+
+
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +26,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-	@Autowired
+    @Autowired
     private JwtService jwtService;
 
     @Autowired
@@ -61,4 +63,3 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
     }
 }
-

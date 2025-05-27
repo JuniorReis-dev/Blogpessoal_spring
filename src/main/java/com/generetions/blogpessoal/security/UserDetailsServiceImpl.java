@@ -1,5 +1,6 @@
 package com.generetions.blogpessoal.security;
 
+
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +14,10 @@ import org.springframework.web.server.ResponseStatusException;
 import com.generetions.blogpessoal.model.Usuario;
 import com.generetions.blogpessoal.repository.UsuarioRepository;
 
+
+
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
-	
 	
 	@Autowired
 	private UsuarioRepository usuarioRepository;

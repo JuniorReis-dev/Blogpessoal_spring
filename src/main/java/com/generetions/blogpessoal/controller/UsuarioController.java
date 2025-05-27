@@ -1,5 +1,6 @@
 package com.generetions.blogpessoal.controller;
 
+
 import java.util.List;
 import java.util.Optional;
 
@@ -26,42 +27,42 @@ import jakarta.validation.Valid;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class UsuarioController {
 
-		@Autowired
-		private UsuarioService usuarioService;
-		
-		@GetMapping("/all")
-		public ResponseEntity<List<Usuario>> getAll() {
+	@Autowired
+	private UsuarioService usuarioService;
+	
+	@GetMapping("/all")
+	public ResponseEntity<List<Usuario>> getAll() {
 
-			return ResponseEntity.ok(usuarioService.getAll());
+		return ResponseEntity.ok(usuarioService.getAll());
 
-		}
-
-		@GetMapping("/{id}")
-		public ResponseEntity<Usuario> getById(@PathVariable Long id) {
-			return usuarioService.getById(id)
-					.map(resposta -> ResponseEntity.ok(resposta))
-					.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-		}
-
-		@PostMapping("/cadastrar")
-		public ResponseEntity<Usuario> post(@Valid @RequestBody Usuario usuario) {
-			return usuarioService.cadastrarUsuario(usuario)
-					.map(resposta -> ResponseEntity.status(HttpStatus.CREATED).body(resposta))
-					.orElse(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
-		}
-
-		@PutMapping("/atualizar")
-		public ResponseEntity<Usuario> put(@Valid @RequestBody Usuario usuario) {
-			return usuarioService.atualizarUsuario(usuario)
-					.map(resposta -> ResponseEntity.status(HttpStatus.OK).body(resposta))
-					.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-		}
-
-		@PostMapping("/logar")
-		public ResponseEntity<UsuarioLogin> autenticar(@Valid @RequestBody Optional<UsuarioLogin> usuarioLogin) {
-			return usuarioService.autenticarUsuario(usuarioLogin)
-					.map(resposta -> ResponseEntity.status(HttpStatus.OK).body(resposta))
-					.orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
-		}
-		
 	}
+
+	@GetMapping("/{id}")
+	public ResponseEntity<Usuario> getById(@PathVariable Long id) {
+		return usuarioService.getById(id)
+				.map(resposta -> ResponseEntity.ok(resposta))
+				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+	}
+
+	@PostMapping("/cadastrar")
+	public ResponseEntity<Usuario> post(@Valid @RequestBody Usuario usuario) {
+		return usuarioService.cadastrarUsuario(usuario)
+				.map(resposta -> ResponseEntity.status(HttpStatus.CREATED).body(resposta))
+				.orElse(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
+	}
+
+	@PutMapping("/atualizar")
+	public ResponseEntity<Usuario> put(@Valid @RequestBody Usuario usuario) {
+		return usuarioService.atualizarUsuario(usuario)
+				.map(resposta -> ResponseEntity.status(HttpStatus.OK).body(resposta))
+				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+	}
+
+	@PostMapping("/logar")
+	public ResponseEntity<UsuarioLogin> autenticar(@Valid @RequestBody Optional<UsuarioLogin> usuarioLogin) {
+		return usuarioService.autenticarUsuario(usuarioLogin)
+				.map(resposta -> ResponseEntity.status(HttpStatus.OK).body(resposta))
+				.orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+	}
+	
+}
